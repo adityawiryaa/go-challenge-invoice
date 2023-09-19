@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -26,9 +27,10 @@ type ResponseData struct {
 func GetInvoice(c *gin.Context) {
 
 	var requestData RequestData
-
 	err := json.NewDecoder(c.Request.Body).Decode(&requestData)
+	log.Println(requestData)
 	if err != nil {
+		log.Println("ERROR", err.Error())
 		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -43,6 +45,7 @@ func GetInvoice(c *gin.Context) {
 	} else if requestData.TypeDiscount == "-" {
 		discountAmount = requestData.Discount
 	} else {
+		log.Println("ERROR", requestData.TypeDiscount)
 		http.Error(c.Writer, "Invalid typeDiscount", http.StatusBadRequest)
 		return
 	}
