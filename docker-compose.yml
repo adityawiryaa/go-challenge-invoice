@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+    invoice-challenge:
+        container_name: invoice-challenge
+        image: adityawiryaa/invoice-challenge
+        restart: always
+        ports:
+        - '6005:6005'

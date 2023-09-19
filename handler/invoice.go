@@ -3,6 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type RequestData struct {
@@ -21,12 +23,13 @@ type ResponseData struct {
 	GrandTotal float64 `json:"grandTotal"`
 }
 
-func GetInvoice(w http.ResponseWriter, r *http.Request) {
+func GetInvoice(c *gin.Context) {
+
 	var requestData RequestData
 
-	err := json.NewDecoder(r.Body).Decode(&requestData)
+	err := json.NewDecoder(c.Request.Body).Decode(&requestData)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -40,7 +43,7 @@ func GetInvoice(w http.ResponseWriter, r *http.Request) {
 	} else if requestData.TypeDiscount == "-" {
 		discountAmount = requestData.Discount
 	} else {
-		http.Error(w, "Invalid typeDiscount", http.StatusBadRequest)
+		http.Error(c.Writer, "Invalid typeDiscount", http.StatusBadRequest)
 		return
 	}
 
@@ -55,6 +58,6 @@ func GetInvoice(w http.ResponseWriter, r *http.Request) {
 		GrandTotal: grandTotal,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(responseData)
+	c.Writer.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(c.Writer).Encode(responseData)
 }
