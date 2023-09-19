@@ -2,6 +2,8 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 
@@ -27,11 +29,19 @@ type ResponseData struct {
 func GetInvoice(c *gin.Context) {
 
 	var requestData RequestData
-	err := json.NewDecoder(c.Request.Body).Decode(&requestData)
-	log.Println(requestData)
+	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		log.Println("ERROR", err.Error())
-		http.Error(c.Writer, err.Error(), http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read request body"})
+		return
+	}
+
+	// Log the request body
+	fmt.Printf("Request Body: %s\n", string(body))
+
+	// Unmarshal the JSON data into the requestData struct
+	err = json.Unmarshal(body, &requestData)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to unmarshal JSON"})
 		return
 	}
 
@@ -45,9 +55,9 @@ func GetInvoice(c *gin.Context) {
 	} else if requestData.TypeDiscount == "-" {
 		discountAmount = requestData.Discount
 	} else {
-		log.Println("ERROR", requestData.TypeDiscount)
-		http.Error(c.Writer, "Invalid typeDiscount", http.StatusBadRequest)
-		return
+		log.Println("ERROR Type Discount", requestData)
+		// http.Error(c.Writer, "Invalid typeDiscount", http.StatusBadRequest)
+		// return
 	}
 
 	// Calculate grand total
