@@ -15,6 +15,6 @@ func main() {
 			"message": "Hello world!",
 		})
 	})
-	router.GET("/invoice", handler.GetInvoice)
+	router.GET("/invoices", handler.GetInvoice)
 	router.Run()
 }
